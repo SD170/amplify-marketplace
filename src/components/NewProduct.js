@@ -14,13 +14,14 @@ import {
 import { createProduct } from "../graphql/mutations";
 import { convertDollerToCents } from "../utils/index";
 
-const NewProduct = ({marketId}) => {
+const NewProduct = ({ marketId }) => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [isShipped, setIsShipped] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [image, setImage] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [precentUploaded, setPercentUploaded] = useState(0);
 
   const resetStates = () => {
     setDescription("");
@@ -29,6 +30,7 @@ const NewProduct = ({marketId}) => {
     setImagePreviewUrl("");
     setImage(null);
     setIsUploading(false);
+    setPercentUploaded(0);
   };
 
   const handleAddProduct = async () => {
@@ -36,9 +38,18 @@ const NewProduct = ({marketId}) => {
       setIsUploading(true);
       const visibility = "public";
       const { identityId } = await Auth.currentCredentials();
-      const fileName = `/${visibility}/${identityId}/${Date.now()}-${image.name}`;
+      const fileName = `/${visibility}/${identityId}/${Date.now()}-${
+        image.name
+      }`;
       const uploadedFile = await Storage.put(fileName, image.file, {
         contentType: image.type,
+        progressCallback: (progress) => {
+          console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
+          const precentUploaded = Math.round(
+            (progress.loaded / progress.total) * 100
+          );
+          setPercentUploaded(precentUploaded);
+        },
       });
 
       const file = {
@@ -48,26 +59,27 @@ const NewProduct = ({marketId}) => {
       };
 
       const input = {
-        productMarketId:marketId,
-        description:description,
-        shipped:isShipped,
-        price:convertDollerToCents(price),
-        file:file
-      } 
+        productMarketId: marketId,
+        description: description,
+        shipped: isShipped,
+        price: convertDollerToCents(price),
+        file: file,
+      };
 
-      const result = await API.graphql(graphqlOperation(createProduct,{input:input}));
-      console.log('Created Product', result);
+      const result = await API.graphql(
+        graphqlOperation(createProduct, { input: input })
+      );
+      console.log("Created Product", result);
       Notification({
         title: "Success",
-        message:"Product successfull created",
-        type:"success"
-      })
+        message: "Product successfull created",
+        type: "success",
+      });
       //resetting states
       resetStates();
     } catch (err) {
-      console.error('Error adding product', err);
+      console.error("Error adding product", err);
     }
-    
   };
 
   return (
@@ -126,6 +138,13 @@ const NewProduct = ({marketId}) => {
               alt="Product Preview"
             />
           )}
+          {precentUploaded > 0 && (
+            <Progress
+              type="circle"
+              className="progress"
+              percentage={precentUploaded}
+            />
+          )}
           <PhotoPicker
             title="Product Image"
             preview="hidden"
@@ -166,7 +185,7 @@ const NewProduct = ({marketId}) => {
               onClick={handleAddProduct}
               loading={isUploading}
             >
-              {isUploading?'Uploading...':'Add Product'}
+              {isUploading ? "Uploading..." : "Add Product"}
             </Button>
           </Form.Item>
         </Form>
