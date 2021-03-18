@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 // prettier-ignore
+import { Auth, Storage, API, graphqlOperation } from "aws-amplify";
 import { PhotoPicker } from "aws-amplify-react";
+import aws_exports from "../aws-exports";
 import {
   Form,
   Button,
@@ -9,28 +11,65 @@ import {
   Radio,
   Progress,
 } from "element-react";
+import { createProduct } from "../graphql/mutations";
+import { convertDollerToCents } from "../utils/index";
 
-const NewProduct = () => {
+const NewProduct = ({marketId}) => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [isShipped, setIsShipped] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [image, setImage] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const resetStates = () => {
     setDescription("");
     setPrice("");
-    isShipped(false);
+    setIsShipped(false);
     setImagePreviewUrl("");
     setImage(null);
+    setIsUploading(false);
   };
 
-  const handleAddProduct = () => {
-    // console.log("product added");
-    console.log(description, price, isShipped, image);
-    //resetting states
-    resetStates();
+  const handleAddProduct = async () => {
+    try {
+      setIsUploading(true);
+      const visibility = "public";
+      const { identityId } = await Auth.currentCredentials();
+      const fileName = `/${visibility}/${identityId}/${Date.now()}-${image.name}`;
+      const uploadedFile = await Storage.put(fileName, image.file, {
+        contentType: image.type,
+      });
+
+      const file = {
+        bucket: aws_exports.aws_user_files_s3_bucket,
+        region: aws_exports.aws_project_region,
+        key: uploadedFile.key,
+      };
+
+      const input = {
+        productMarketId:marketId,
+        description:description,
+        shipped:isShipped,
+        price:convertDollerToCents(price),
+        file:file
+      } 
+
+      const result = await API.graphql(graphqlOperation(createProduct,{input:input}));
+      console.log('Created Product', result);
+      Notification({
+        title: "Success",
+        message:"Product successfull created",
+        type:"success"
+      })
+      //resetting states
+      resetStates();
+    } catch (err) {
+      console.error('Error adding product', err);
+    }
+    
   };
+
   return (
     <div className="flex-center">
       <h2 className="header">Add New Product</h2>
@@ -122,11 +161,12 @@ const NewProduct = () => {
           />
           <Form.Item>
             <Button
-              disabled={!description || !price || !image}
+              disabled={!description || !price || !image || isUploading}
               type="primary"
               onClick={handleAddProduct}
+              loading={isUploading}
             >
-              Add Product
+              {isUploading?'Uploading...':'Add Product'}
             </Button>
           </Form.Item>
         </Form>

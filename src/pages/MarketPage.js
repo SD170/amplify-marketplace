@@ -22,7 +22,7 @@ const MarketPage = (props) => {
       id: marketId,
     };
     const result = await API.graphql(graphqlOperation(getMarket, input));
-    console.log(result);
+    // console.log(result);
     await setMarket((prevMarket) => {
       if (result.data.getMarket) {
         checkMarketOwner(result.data.getMarket.owner);
@@ -74,7 +74,7 @@ const MarketPage = (props) => {
             }
             name="1"
           >
-            <NewProduct />
+            <NewProduct marketId={marketId} />
           </Tabs.Pane>
         )}
 
