@@ -12,7 +12,7 @@ import {
   Progress,
 } from "element-react";
 import { createProduct } from "../graphql/mutations";
-import { convertDollerToCents } from "../utils/index";
+import { convertDollersToCents } from "../utils/index";
 
 const NewProduct = ({ marketId }) => {
   const [description, setDescription] = useState("");
@@ -62,7 +62,7 @@ const NewProduct = ({ marketId }) => {
         productMarketId: marketId,
         description: description,
         shipped: isShipped,
-        price: convertDollerToCents(price),
+        price: convertDollersToCents(price),
         file: file,
       };
 

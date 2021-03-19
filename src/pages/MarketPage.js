@@ -1,12 +1,50 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { API, graphqlOperation } from "aws-amplify";
 import { useParams, Link } from "react-router-dom";
 import { Loading, Tabs, Icon } from "element-react";
-import { getMarket } from "../graphql/queries";
-import NewProduct from "../components/NewProduct";
+// import { getMarket } from "../graphql/queries";
 import Product from "../components/Product";
+import NewProduct from "../components/NewProduct";
+import {
+  onCreateProduct,
+  onUpdateProduct,
+  onDeleteProduct,
+} from "../graphql/subscriptions";
+import { UserContext } from "../App";
+import { updateMarket } from "../graphql/mutations";
+
+const getMarket = /* GraphQL */ `
+  query GetMarket($id: ID!) {
+    getMarket(id: $id) {
+      id
+      name
+      products {
+        items {
+          id
+          description
+          price
+          shipped
+          owner
+          file {
+            key
+          }
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      tags
+      owner
+      createdAt
+      updatedAt
+    }
+  }
+`;
 
 const MarketPage = (props) => {
+  //we need owner for subscription
+  const { user } = useContext(UserContext);
+
   const { marketId } = useParams();
   const [market, setMarket] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -14,15 +52,81 @@ const MarketPage = (props) => {
 
   useEffect(() => {
     handleGetMarket();
+
+    const createProductListener = API.graphql(
+      graphqlOperation(onCreateProduct, { owner: user.attributes.sub })
+    ).subscribe({
+      next: (productData) => {
+        const createdProduct = productData.value.data.onCreateProduct;
+        //check and remove if any productId is same as the created productId
+        setMarket((prevMarket) => {
+          const previousProducts = prevMarket.products.items.filter(
+            (item) => item.id !== createdProduct.id
+          );
+          const updatedProducts = [createdProduct, ...previousProducts];
+
+          const updatedMarket = { ...prevMarket };
+          updatedMarket.products.items = updatedProducts;
+          return updatedMarket;
+        });
+      },
+    });
+
+    const updateProductListener = API.graphql(
+      graphqlOperation(onUpdateProduct, { owner: user.attributes.sub })
+    ).subscribe({
+      next: (productData) => {
+        const updatedProduct = productData.value.data.onUpdateProduct;
+        setMarket((prevMarket) => {
+          const updatedProductIndex = prevMarket.products.items.findIndex(
+            (item) => item.id === updatedProduct.id
+          );
+          const updatedProducts = [
+            ...prevMarket.products.items.slice(0, updatedProductIndex),
+            updatedProduct,
+            ...prevMarket.products.items.slice(updatedProductIndex + 1),
+          ];
+
+          const updatedMarket = { ...prevMarket };
+          updatedMarket.products.items = updatedProducts;
+          return updatedMarket;
+        });
+      },
+    });
+
+    const deleteProductListener = API.graphql(
+      graphqlOperation(onDeleteProduct, { owner: user.attributes.sub })
+    ).subscribe({
+      next: (productData) => {
+        const deletedProduct = productData.value.data.onDeleteProduct;
+        setMarket((prevMarket) => {
+          const updatedProducts = prevMarket.products.items.filter(
+            (item) => item.id !== deletedProduct.id
+          );
+
+          const updatedMarket = { ...prevMarket };
+          updatedMarket.products.items = updatedProducts;
+          return updatedMarket;
+        });
+      },
+    });
+
+    const unmountFunction = () => {
+      createProductListener.unsubscribe();
+      updateProductListener.unsubscribe();
+      deleteProductListener.unsubscribe();
+    };
+
+    return unmountFunction;
   }, []);
 
   const handleGetMarket = async () => {
-    // console.log(user);
+    console.log(marketId);
     const input = {
       id: marketId,
     };
     const result = await API.graphql(graphqlOperation(getMarket, input));
-    // console.log(result);
+    console.log(result);
     await setMarket((prevMarket) => {
       if (result.data.getMarket) {
         checkMarketOwner(result.data.getMarket.owner);
@@ -69,7 +173,7 @@ const MarketPage = (props) => {
             label={
               <>
                 <Icon name="plus" className="icon" />
-                  Add Product
+                Add Product
               </>
             }
             name="1"
@@ -88,11 +192,11 @@ const MarketPage = (props) => {
           }
           name="2"
         >
-          {/* <div className="product-list">
-            {market.products.items.map((product) => {
-              <Product product={product} />
-            })}
-          </div> */}
+          <div className="product-list">
+            {market.products.items.map((product) => (
+              <Product key={product.id} product={product} />
+            ))}
+          </div>
         </Tabs.Pane>
       </Tabs>
     </>
