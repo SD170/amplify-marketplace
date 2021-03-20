@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 // prettier-ignore
 import { Auth, Storage, API, graphqlOperation } from "aws-amplify";
 import { PhotoPicker } from "aws-amplify-react";
@@ -13,8 +13,11 @@ import {
 } from "element-react";
 import { createProduct } from "../graphql/mutations";
 import { convertDollersToCents } from "../utils/index";
+import { UserContext } from "../App";
+
 
 const NewProduct = ({ marketId }) => {
+  const { user } = useContext(UserContext);
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [isShipped, setIsShipped] = useState(false);
@@ -59,6 +62,7 @@ const NewProduct = ({ marketId }) => {
       };
 
       const input = {
+        owner:user.attributes.sub,
         productMarketId: marketId,
         description: description,
         shipped: isShipped,
@@ -81,6 +85,10 @@ const NewProduct = ({ marketId }) => {
       console.error("Error adding product", err);
     }
   };
+
+  // useEffect(()=> {
+  //   console.log(user);
+  // },[])
 
   return (
     <div className="flex-center">

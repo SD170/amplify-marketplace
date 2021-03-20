@@ -11,7 +11,6 @@ import {
   onDeleteProduct,
 } from "../graphql/subscriptions";
 import { UserContext } from "../App";
-import { updateMarket } from "../graphql/mutations";
 
 const getMarket = /* GraphQL */ `
   query GetMarket($id: ID!) {
@@ -49,6 +48,7 @@ const MarketPage = (props) => {
   const [market, setMarket] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMarketOwner, setIsMarketOwner] = useState(false);
+  const [toggleState, setToggleState] = useState(true);
 
   useEffect(() => {
     handleGetMarket();
@@ -121,13 +121,14 @@ const MarketPage = (props) => {
   }, []);
 
   const handleGetMarket = async () => {
-    console.log(marketId);
+    // console.log(marketId);
     const input = {
       id: marketId,
     };
     const result = await API.graphql(graphqlOperation(getMarket, input));
-    console.log(result);
-    await setMarket((prevMarket) => {
+    // console.log(result);
+    
+    setMarket((prevMarket) => {
       if (result.data.getMarket) {
         checkMarketOwner(result.data.getMarket.owner);
         return result.data.getMarket;
@@ -136,6 +137,7 @@ const MarketPage = (props) => {
       }
     });
     // checkMarketOwner();
+    // console.log(market);
     setIsLoading(false);
   };
 
@@ -144,6 +146,9 @@ const MarketPage = (props) => {
     if (user) {
       setIsMarketOwner(user.username === owner);
     }
+    //torerender
+    // setToggleState(!toggleState);
+    
   };
 
   return isLoading ? (

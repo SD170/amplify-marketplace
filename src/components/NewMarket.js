@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { API, graphqlOperation } from "aws-amplify";
 import { createMarket } from "../graphql/mutations";
 // prettier-ignore
