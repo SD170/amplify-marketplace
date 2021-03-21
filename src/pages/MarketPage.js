@@ -48,7 +48,6 @@ const MarketPage = (props) => {
   const [market, setMarket] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMarketOwner, setIsMarketOwner] = useState(false);
-  const [toggleState, setToggleState] = useState(true);
 
   useEffect(() => {
     handleGetMarket();
