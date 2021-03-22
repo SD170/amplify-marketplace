@@ -1,7 +1,8 @@
 import React, { useState, useEffect, createContext } from "react";
 import { Auth, Hub, graphqlOperation, API } from "aws-amplify";
 import { Authenticator, AmplifyTheme } from "aws-amplify-react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Router, Route } from "react-router-dom";
+import {createBrowserHistory} from "history";
 import { getMarket, getUser } from "./graphql/queries";
 import { registerUser } from "./graphql/mutations";
 import HomePage from "./pages/HomePage";
@@ -10,6 +11,8 @@ import MarketPage from "./pages/MarketPage";
 import Navbar from "./components/Navbar";
 import "./App.css";
 import "@aws-amplify/ui/dist/style.css";
+
+export const history = createBrowserHistory();
 
 export const UserContext = createContext();
 
@@ -106,7 +109,7 @@ const App = (props) => {
 
   return user ? (
     <UserContext.Provider value={{ user: user }}>
-      <Router>
+      <Router history={history}>
         <React.Fragment>
           {/* Navigation */}
           <Navbar user={user} handleSignout={handleSignout} />
