@@ -12,7 +12,7 @@ import {
   Progress,
 } from "element-react";
 import { createProduct } from "../graphql/mutations";
-import { convertDollersToCents } from "../utils/index";
+import { convertRupeesToPaise } from "../utils/index";
 import { UserContext } from "../App";
 
 
@@ -66,7 +66,7 @@ const NewProduct = ({ marketId }) => {
         productMarketId: marketId,
         description: description,
         shipped: isShipped,
-        price: convertDollersToCents(price),
+        price: convertRupeesToPaise(price),
         file: file,
       };
 
@@ -110,7 +110,7 @@ const NewProduct = ({ marketId }) => {
             <Input
               type="number"
               icon="plus"
-              placeholder="Price ($USD)"
+              placeholder="Price (₹INR)"
               value={price}
               onChange={(price) => {
                 setPrice(price);

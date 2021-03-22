@@ -6,7 +6,7 @@ import { S3Image } from "aws-amplify-react";
 import { Notification, Popover, Button, Dialog, Card, Form, Input, Radio } from "element-react";
 import PayButton from "../components/PayButton";
 import { updateProduct, deleteProduct } from "../graphql/mutations";
-import { convertCentsToDollers, convertDollersToCents } from "../utils/index";
+import { convertRupeesToPaise, convertPaiseToRupees } from "../utils/index";
 
 const Product = ({ product }) => {
   const { user } = useContext(UserContext);
@@ -24,7 +24,7 @@ const Product = ({ product }) => {
       const input = {
         id: product.id,
         description: description,
-        price: convertDollersToCents(price),
+        price: convertRupeesToPaise(price),
         shipped: isShipped,
       };
       const result = await API.graphql(
@@ -45,9 +45,11 @@ const Product = ({ product }) => {
     try {
       setDeleteProductDialog(false);
       const input = {
-        id:product.id
-      }
-      const result = await API.graphql(graphqlOperation(deleteProduct, {input:input}));
+        id: product.id,
+      };
+      const result = await API.graphql(
+        graphqlOperation(deleteProduct, { input: input })
+      );
       // console.log(result);
       Notification({
         title: "Success",
@@ -55,9 +57,9 @@ const Product = ({ product }) => {
         type: "success",
       });
     } catch (err) {
-      console.error(`Failed to delete product with id ${product.id}`,err);
+      console.error(`Failed to delete product with id ${product.id}`, err);
     }
-  }
+  };
 
   return (
     <div className="card-container">
@@ -98,9 +100,7 @@ const Product = ({ product }) => {
             {product.shipped ? "Shipped" : "Emailed"}
           </div>
           <div className="text-right">
-            <span className="mx-1">
-              ${convertCentsToDollers(product.price)}
-            </span>
+            <span className="mx-1">₹{convertPaiseToRupees(product.price)}</span>
             {!isProductOwner && <PayButton product={product} user={user} />}
           </div>
         </div>
@@ -116,7 +116,7 @@ const Product = ({ product }) => {
               onClick={() => {
                 setUpdateProductDialog(true);
                 setDescription(product.description);
-                setPrice(convertCentsToDollers(product.price));
+                setPrice(convertPaiseToRupees(product.price));
                 setIsShipped(product.shipped);
               }}
             />
@@ -139,14 +139,27 @@ const Product = ({ product }) => {
                     >
                       Cancle
                     </Button>
-                    <Button type="primary" size="mini" className="m-1" onClick={()=>{handleDeleteProduct()}}>
+                    <Button
+                      type="primary"
+                      size="mini"
+                      className="m-1"
+                      onClick={() => {
+                        handleDeleteProduct();
+                      }}
+                    >
                       Confirm
                     </Button>
                   </div>
                 </>
               }
             >
-              <Button onClick={()=>{setDeleteProductDialog(true)}} type="danger" icon="delete" />
+              <Button
+                onClick={() => {
+                  setDeleteProductDialog(true);
+                }}
+                type="danger"
+                icon="delete"
+              />
             </Popover>
           </>
         )}
@@ -178,7 +191,7 @@ const Product = ({ product }) => {
               <Input
                 type="number"
                 icon="plus"
-                placeholder="Price ($USD)"
+                placeholder="Price (₹INR)"
                 value={price}
                 onChange={(price) => {
                   setPrice(price);

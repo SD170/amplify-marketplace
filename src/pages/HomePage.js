@@ -13,7 +13,7 @@ const HomePage = () => {
     try {
       e.preventDefault();
       setIsSearching(true);
-      console.log("Submitted", searchTerm);
+      // console.log("Submitted", searchTerm);
       const result = await API.graphql(
         graphqlOperation(listMarkets, {
           filter: {
@@ -25,7 +25,7 @@ const HomePage = () => {
           },
         })
       );
-      console.log(result);
+      // console.log(result);
       setSearchResults(result.data.listMarkets.items);
       setIsSearching(false);
     } catch (err) {

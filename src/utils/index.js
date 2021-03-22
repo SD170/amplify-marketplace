@@ -1,6 +1,6 @@
-export const convertDollersToCents = (price) => {
+export const convertRupeesToPaise = (price) => {
   return (price * 100).toFixed(0);
 };
-export const convertCentsToDollers = (price) => {
+export const convertPaiseToRupees = (price) => {
   return (price / 100).toFixed(2);
 };
