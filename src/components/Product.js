@@ -9,8 +9,8 @@ import { updateProduct, deleteProduct } from "../graphql/mutations";
 import { convertRupeesToPaise, convertPaiseToRupees } from "../utils/index";
 
 const Product = ({ product }) => {
-  const { user } = useContext(UserContext);
-  const isProductOwner = user && user.attributes.sub === product.owner;
+  const { userInfo } = useContext(UserContext);
+  const isProductOwner = userInfo && userInfo.attributes.sub === product.owner;
 
   const [updateProductDialog, setUpdateProductDialog] = useState(false);
   const [deleteProductDialog, setDeleteProductDialog] = useState(false);
@@ -101,7 +101,7 @@ const Product = ({ product }) => {
           </div>
           <div className="text-right">
             <span className="mx-1">₹{convertPaiseToRupees(product.price)}</span>
-            {!isProductOwner && <PayButton product={product} user={user} />}
+            {!isProductOwner && <PayButton product={product} userInfo={userInfo} />}
           </div>
         </div>
       </Card>

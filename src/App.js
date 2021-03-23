@@ -18,6 +18,7 @@ export const UserContext = createContext();
 
 const App = (props) => {
   const [user, setUser] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
     getUSerData();
@@ -33,9 +34,18 @@ const App = (props) => {
   const getUSerData = async () => {
     const authenticatedUser = await Auth.currentAuthenticatedUser();
     setUser((prevUser) => {
+      if(authenticatedUser){
+        getUserAttributes(authenticatedUser);
+      }
       return authenticatedUser ? authenticatedUser : prevUser;
     });
   };
+
+  const getUserAttributes = async (authUserData) => {
+    const userInfo = await Auth.currentUserInfo(authUserData);
+    setUserInfo(userInfo);
+    console.log(userInfo);
+  }
 
   const onHubCapsule = (payload) => {
     switch (payload.event) {
@@ -107,18 +117,18 @@ const App = (props) => {
     },
   };
 
-  return user ? (
-    <UserContext.Provider value={{ user: user }}>
+  return (userInfo && user) ? (
+    <UserContext.Provider value={{ user: user, userInfo:userInfo }}>
       <Router history={history}>
         <React.Fragment>
           {/* Navigation */}
-          <Navbar user={user} handleSignout={handleSignout} />
+          <Navbar user={user} userInfo={userInfo} handleSignout={handleSignout} />
 
           {/* Routes */}
           <div className="app-container">
             <Route exact path="/" component={HomePage} />
             <Route path="/profile" >
-              <ProfilePage user={user} />
+              <ProfilePage user={user} userInfo={userInfo} />
             </Route>
             <Route path="/markets/:marketId">
               <MarketPage user={user} />

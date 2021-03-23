@@ -12,7 +12,7 @@ const stripeConfig = {
     "pk_test_51IWundSFKRW4ibNg4FzNg2tlzcXz4zkTE7yZ6u1IQvTzp6l0r7JqQ9jIlepnSKpvf1oWFHzE3A4GQIGsEc8LSBbN00ktpthm4n",
 };
 
-const PayButton = ({ product, user }) => {
+const PayButton = ({ product, userInfo }) => {
   const getOwnerEmail = async (ownerId) => {
     try {
       const input = {
@@ -47,7 +47,7 @@ const PayButton = ({ product, user }) => {
             description: product.description,
           },
           email: {
-            customerEmail: user.attributes.email,
+            customerEmail: userInfo.attributes.email,
             ownerEmail: ownerEmail,
             shipped: product.shipped,
           },
@@ -61,7 +61,7 @@ const PayButton = ({ product, user }) => {
         }
 
         const input = {
-          orderUserId:user.attributes.sub,
+          orderUserId:userInfo.attributes.sub,
           orderProductId:product.id,
           shippingAddress:shippingAddress
         }
@@ -99,7 +99,7 @@ const PayButton = ({ product, user }) => {
   return (
     <StripeCheckout
       token={handleCharge}
-      email={user.attributes.email}
+      email={userInfo.attributes.email}
       name={product.description}
       amount={product.price}
       currency={stripeConfig.currency}
