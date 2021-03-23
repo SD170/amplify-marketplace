@@ -116,7 +116,7 @@ export const getUser = /* GraphQL */ `
       username
       email
       registered
-      order {
+      orders {
         items {
           id
           createdAt

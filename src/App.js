@@ -117,7 +117,9 @@ const App = (props) => {
           {/* Routes */}
           <div className="app-container">
             <Route exact path="/" component={HomePage} />
-            <Route path="/profile" component={ProfilePage} />
+            <Route path="/profile" >
+              <ProfilePage user={user} />
+            </Route>
             <Route path="/markets/:marketId">
               <MarketPage user={user} />
             </Route>

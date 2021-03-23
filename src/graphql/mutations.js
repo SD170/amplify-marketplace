@@ -188,7 +188,7 @@ export const registerUser = /* GraphQL */ `
       username
       email
       registered
-      order {
+      orders {
         items {
           id
           createdAt
@@ -211,7 +211,7 @@ export const updateUser = /* GraphQL */ `
       username
       email
       registered
-      order {
+      orders {
         items {
           id
           createdAt
@@ -258,7 +258,7 @@ export const createOrder = /* GraphQL */ `
         username
         email
         registered
-        order {
+        orders {
           nextToken
         }
         createdAt
