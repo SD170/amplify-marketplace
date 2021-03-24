@@ -131,7 +131,7 @@ const App = (props) => {
               <ProfilePage user={user} userInfo={userInfo} />
             </Route>
             <Route path="/markets/:marketId">
-              <MarketPage user={user} />
+              <MarketPage user={user} userInfo={userInfo} />
             </Route>
           </div>
         </React.Fragment>

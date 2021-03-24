@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Auth, API, graphqlOperation, input } from "aws-amplify";
 // prettier-ignore
 import { Table, Button, Notification, MessageBox, Message, Tabs, Icon, Form, Dialog, Input, Card, Tag } from 'element-react'
-import { convertPaiseToRupees } from "../utils/index";
+import { convertPaiseToRupees, formatOrderDate } from "../utils/index";
 
 const getUser = /* GraphQL */ `
   query GetUser($id: ID!) {
@@ -80,7 +80,7 @@ const ProfilePage = ({ user, userInfo }) => {
             );
           case "Delete Profile":
             return (
-              <Button type="danger" size="small">
+              <Button type="danger" size="small" onClick={handleDeleteProfile}>
                 Delete
               </Button>
             );
@@ -114,6 +114,9 @@ const ProfilePage = ({ user, userInfo }) => {
 
       if (result === "SUCCESS") {
         sendVerificationCode("email");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       }
     } catch (err) {
       console.error(err);
@@ -136,23 +139,50 @@ const ProfilePage = ({ user, userInfo }) => {
 
   const handleVerifyEmail = async (attr) => {
     try {
-      const result = await Auth.verifyCurrentUserAttributeSubmit(attr,verificationCode);
+      const result = await Auth.verifyCurrentUserAttributeSubmit(
+        attr,
+        verificationCode
+      );
       Notification({
-        title:"Success",
-        message:"Email successfully verified",
-        type:`${result.toLocaleLowerCase()}`
-      })
-      setTimeout(()=>{
-        window.location.reload()
-      },3000)
+        title: "Success",
+        message: "Email successfully verified",
+        type: `${result.toLocaleLowerCase()}`,
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     } catch (err) {
       console.error(err);
       Notification.error({
-        title:"Error",
-        message:`${err.message || 'Error updating email'}`
-      })
+        title: "Error",
+        message: `${err.message || "Error updating email"}`,
+      });
     }
-  }
+  };
+  const handleDeleteProfile = () => {
+    MessageBox.confirm(
+      "This will permanently delete your account. Continue?",
+      "Attention!",
+      {
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancle",
+        type: "warning",
+      }
+    )
+      .then(async () => {
+        try {
+          await user.deleteUser(()=>window.location.reload());
+        } catch (err) {
+          console.error(err,'err');
+        }
+      })
+      .catch(() => {
+        Message({
+          type: "info",
+          message: "Delete canceled",
+        });
+      });
+  };
 
   return (
     userInfo &&
@@ -214,7 +244,7 @@ const ProfilePage = ({ user, userInfo }) => {
                     <p>Order Id: {order.id}</p>
                     <p>Product Description: {order.product.description}</p>
                     <p>Price: {convertPaiseToRupees(order.product.price)}</p>
-                    <p>Purchased on: {order.createdAt}</p>
+                    <p>Purchased on: {formatOrderDate(order.createdAt)}</p>
                     {order.shippingAddress && (
                       <>
                         Shipping Address

@@ -11,13 +11,14 @@ import {
   onDeleteProduct,
 } from "../graphql/subscriptions";
 import { UserContext } from "../App";
+import { formatProductDate } from "../utils/index";
 
 const getMarket = /* GraphQL */ `
   query GetMarket($id: ID!) {
     getMarket(id: $id) {
       id
       name
-      products (sortDirection: DESC, limit:999) {
+      products(sortDirection: DESC, limit: 999) {
         items {
           id
           description
@@ -48,6 +49,7 @@ const MarketPage = (props) => {
   const [market, setMarket] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMarketOwner, setIsMarketOwner] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   useEffect(() => {
     handleGetMarket();
@@ -126,10 +128,11 @@ const MarketPage = (props) => {
     };
     const result = await API.graphql(graphqlOperation(getMarket, input));
     // console.log(result);
-    
+
     setMarket((prevMarket) => {
       if (result.data.getMarket) {
         checkMarketOwner(result.data.getMarket.owner);
+        checkEmailVerified();
         return result.data.getMarket;
       } else {
         return prevMarket;
@@ -140,6 +143,13 @@ const MarketPage = (props) => {
     setIsLoading(false);
   };
 
+  const checkEmailVerified = () => {
+    const { userInfo } = props;
+    if (userInfo) {
+      setIsEmailVerified(userInfo.attributes.email_verified);
+    }
+  };
+
   const checkMarketOwner = (owner) => {
     const { user } = props;
     if (user) {
@@ -147,7 +157,6 @@ const MarketPage = (props) => {
     }
     //torerender
     // setToggleState(!toggleState);
-    
   };
 
   return isLoading ? (
@@ -166,7 +175,7 @@ const MarketPage = (props) => {
       <div className="items-center pt-2">
         <span style={{ color: "var(--lightSquidInk", paddingBottom: "1em" }}>
           <Icon name="date" className="icon" />
-          {market.createdAt}
+          {formatProductDate(market.createdAt)}
         </span>
       </div>
 
@@ -182,7 +191,13 @@ const MarketPage = (props) => {
             }
             name="1"
           >
-            <NewProduct marketId={marketId} />
+            {isEmailVerified ? (
+              <NewProduct marketId={marketId} />
+            ) : (
+              <Link to="/profile">
+                Verify Your Email Before Adding Products
+              </Link>
+            )}
           </Tabs.Pane>
         )}
 

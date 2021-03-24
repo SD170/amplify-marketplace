@@ -7,6 +7,7 @@ import { Notification, Popover, Button, Dialog, Card, Form, Input, Radio } from 
 import PayButton from "../components/PayButton";
 import { updateProduct, deleteProduct } from "../graphql/mutations";
 import { convertRupeesToPaise, convertPaiseToRupees } from "../utils/index";
+import { Link } from "react-router-dom";
 
 const Product = ({ product }) => {
   const { userInfo } = useContext(UserContext);
@@ -17,6 +18,8 @@ const Product = ({ product }) => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [isShipped, setIsShipped] = useState(false);
+
+  const isEmailVerified = userInfo && userInfo.attributes.email_verified;
 
   const handleUpdateProduct = async () => {
     try {
@@ -101,7 +104,16 @@ const Product = ({ product }) => {
           </div>
           <div className="text-right">
             <span className="mx-1">₹{convertPaiseToRupees(product.price)}</span>
-            {!isProductOwner && <PayButton product={product} userInfo={userInfo} />}
+            {console.log(userInfo)}
+            {isEmailVerified ? (
+              !isProductOwner && (
+                <PayButton product={product} userInfo={userInfo} />
+              )
+            ) : (
+              <Link to="/profile" className="link">
+                Verify Email
+              </Link>
+            )}
           </div>
         </div>
       </Card>
