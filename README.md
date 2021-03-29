@@ -4,7 +4,7 @@
 [![Amplify](https://backendless.com/wp-content/uploads/2020/02/AWS-Amplify-Logo-Small.png)](https://aws.amazon.com/amplify/)
 
 ## Description
-User can showcase their product in our cloud platform, buying/selling/payments all are integral part of the product. They can setup their market, withing the market their would be products with a certain price tag. Register, login is done via Email(primary), phone-number and username.
+User can showcase their product in our cloud platform, buying/selling/payments are an integral part of the product. They can set up their market, within the market there would be products with a certain price tag. Register, login is done via Email(primary), phone number, and username.
 
 
 ## Tech
@@ -13,7 +13,7 @@ User can showcase their product in our cloud platform, buying/selling/payments a
 - [S3] bucket used to host product images.
 - [AWS SES] (Simple Email Service) to send email to buyer and seller.
 - [Cognito] used for authentication.
-- [Graphql] used as Backend-Api.
+- [Graphql] used as Backend-API.
 - [ReactJS] for Frontend.
 - [AWS Lambda] to process Payments and Mailing in the backend.
 
