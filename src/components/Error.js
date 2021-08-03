@@ -1,4 +1,3 @@
-import { ErrorSection } from "aws-amplify-react/dist/AmplifyUI";
 import React from "react";
 
 const Error = ({ errors }) => {

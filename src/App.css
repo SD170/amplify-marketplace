@@ -109,6 +109,9 @@ body {
 .text-green {
   color: green;
 }
+.text-red {
+  color: rgb(211, 34, 28);
+}
 
 .message {
   z-index: 2000 !important;

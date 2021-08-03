@@ -104,7 +104,6 @@ const Product = ({ product }) => {
           </div>
           <div className="text-right">
             <span className="mx-1">₹{convertPaiseToRupees(product.price)}</span>
-            {console.log(userInfo)}
             {isEmailVerified ? (
               !isProductOwner && (
                 <PayButton product={product} userInfo={userInfo} />

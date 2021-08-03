@@ -8,6 +8,7 @@ const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearchTerm = async (e) => {
     try {
@@ -24,10 +25,12 @@ const HomePage = () => {
             ],
           },
         })
-      );
+        );
+        // console.log("yo");
       // console.log(result);
       setSearchResults(result.data.listMarkets.items);
       setIsSearching(false);
+      setHasSearched(true);
     } catch (err) {
       console.error(err);
     }
@@ -35,11 +38,13 @@ const HomePage = () => {
 
   const handleSearchTermChange = (searchTerm) => {
     setSearchTerm(searchTerm);
-    // console.log("onchange", searchTerm);
+    setHasSearched(false);
+    
   };
   const handleClearSearchTerm = () => {
     setSearchTerm("");
     setSearchResults([]);
+    setHasSearched(false);
     // console.log("Cleared");
   };
   return (
@@ -50,8 +55,9 @@ const HomePage = () => {
         handleSearchTermChange={handleSearchTermChange}
         handleSearchTerm={handleSearchTerm}
         handleClearSearchTerm={handleClearSearchTerm}
+        
       />
-      <MarketList searchResults={searchResults} searchTerm={searchTerm} />
+      <MarketList searchResults={searchResults} searchTerm={searchTerm} hasSearched={hasSearched} />
     </>
   );
 };

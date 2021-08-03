@@ -159,7 +159,9 @@ const NewProduct = ({ marketId }) => {
             onLoad={(url) => {
               setImagePreviewUrl(url);
             }}
+            
             onPick={(file) => {
+              console.log("here")
               setImage(file);
             }}
             theme={{
@@ -182,8 +184,9 @@ const NewProduct = ({ marketId }) => {
                 color: "var(--darkAmazonOrange)",
               },
               photoPickerButton: {
-                display: "none",
+                // display: "none",
               },
+              
             }}
           />
           <Form.Item>

@@ -23,7 +23,15 @@ const NewMarket = ({
     "Crafts",
   ]);
   const [selectedTags, setSelectedTags] = useState([]);
-  const [options, setOptions] = useState([]);
+  //after removeing filterable, remote and remoteMethod adding
+  // const [options, setOptions] = useState([]);
+  const [options, setOptions] = useState([
+    { value: "Arts", lable: "Arts" },
+    { value: "Entertainment", lable: "Entertainment" },
+    { value: "Technology", lable: "Technology" },
+    { value: "Education", lable: "Education" },
+    { value: "Crafts", lable: "Crafts" },
+  ]);
 
   const handleAddMarket = async (user) => {
     try {
@@ -51,23 +59,23 @@ const NewMarket = ({
     }
   };
 
-  const handleFilterTags = (query) => {
-    const options = tags
-      .map((tag) => {
-        return { value: tag, lable: tag };
-      })
-      .filter((tag) => {
-        return tag.lable.toLowerCase().includes(query.toLowerCase());
-      });
-    setOptions(options);
-  };
+  // const handleFilterTags = (query) => {
+  //   const options = tags
+  //     .map((tag) => {
+  //       return { value: tag, lable: tag };
+  //     })
+  //     .filter((tag) => {
+  //       return tag.lable.toLowerCase().includes(query.toLowerCase());
+  //     });
+  //   setOptions(options);
+  // };
 
   return (
     <>
       <div className="market-header">
         <h1
           className="market-title"
-          style={{cursor:"pointer"}}
+          style={{ cursor: "pointer" }}
           onClick={() => {
             setAddMarketDialog(true);
           }}
@@ -123,14 +131,20 @@ const NewMarket = ({
             <Form.Item label="Add Tags">
               <Select
                 multiple={true}
-                filterable={true}
+                value=""  //VVI
                 placeholder="Market Tags"
                 onChange={(selected) => {
                   setSelectedTags(selected);
                   console.log(selected);
                 }}
-                remoteMethod={handleFilterTags}
-                remote={true}
+
+                // filterable={true}
+                // no-data-text="Search"
+                // no-match-text="Search"
+                // noMatchText="Search"
+                // noDataText="Search"
+                // remoteMethod={handleFilterTags}
+                // remote={true}
               >
                 {options.map((option) => {
                   return (

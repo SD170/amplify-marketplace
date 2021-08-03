@@ -7,7 +7,7 @@ import { listMarkets } from "../graphql/queries";
 import { onCreateMarket } from "../graphql/subscriptions";
 import Error from "./Error";
 
-const MarketList = ({ searchResults, searchTerm }) => {
+const MarketList = ({ searchResults, searchTerm, hasSearched }) => {
   const history = useHistory();
   const onNewMarket = (prevQuery, newData) => {
     let updatedQuery = { ...prevQuery };
@@ -28,15 +28,24 @@ const MarketList = ({ searchResults, searchTerm }) => {
         if (errors.length > 0) return <Error errors={errors} />;
         if (loading || !data.listMarkets) return <Loading fullscreen={true} />;
         const markets =
-          searchResults.length > 0 ? searchResults : data.listMarkets.items;
+          searchResults.length > 0 || hasSearched
+            ? searchResults
+            : data.listMarkets.items;
 
         return (
           <>
-            {searchResults.length > 0 ? (
-              <h2 className="text-green">
-                <Icon type="success" name="check" className="icon" />
-                {searchResults.length} Results for Term "{searchTerm}"
-              </h2>
+            {searchResults.length > 0 || hasSearched ? (
+              searchResults.length > 0 ? (
+                <h2 className="text-green">
+                  <Icon type="success" name="check" className="icon" />
+                  {searchResults.length} Results for Term "{searchTerm}"
+                </h2>
+              ) : (
+                <h2 className="text-red">
+                  <Icon type="success" name="close" className="icon" />
+                  {searchResults.length} Results for Term "{searchTerm}"
+                </h2>
+              )
             ) : (
               <h2 className="header">
                 <svg
