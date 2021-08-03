@@ -65,16 +65,15 @@ const NewMarket = ({
   return (
     <>
       <div className="market-header">
-        <h1 className="market-title">
+        <h1
+          className="market-title"
+          style={{cursor:"pointer"}}
+          onClick={() => {
+            setAddMarketDialog(true);
+          }}
+        >
           Create Your MarketPlace
-          <Button
-            type="text"
-            icon="edit"
-            className="market-title-button"
-            onClick={() => {
-              setAddMarketDialog(true);
-            }}
-          />
+          <Button type="text" icon="edit" className="market-title-button" />
         </h1>
 
         <Form inline={true} onSubmit={handleSearchTerm}>
